@@ -3,7 +3,12 @@
 #include "Material.hpp"
 #include "Logger.hpp"
 
-// 상태 4가지로 확장: 대기, 호버, 1회 클릭, 2회 클릭
+// ==============================================================================
+// [1. 상태 정의 및 변수 선언 문단]
+// enum class를 사용하여 4가지 상태를 안전하게 격리합니다.
+// 또한 이전 프레임의 마우스 상태(prevLBit, prevHover)를 기억하여 
+// '누르고 있는 중'이 아니라 '방금 눌린 순간'을 감지(Edge Detection)할 준비를 합니다.
+// ==============================================================================
 enum class ButtonState { IDLE, HOVER, CLICKED_1, CLICKED_2 };
 
 class ButtonFSM : public Component {
@@ -11,84 +16,73 @@ class ButtonFSM : public Component {
     ColorMaterial* pMat = nullptr;
 
     bool prevLBit = false;
-    bool prevHover = false; // 이전 프레임의 마우스 호버 상태
+    bool prevHover = false;
 
 public:
     ButtonFSM(ColorMaterial* m) : pMat(m) {}
-
     ButtonState GetState() const { return state; }
 
+    // ==============================================================================
+    // [2. 입력 감지 문단 (Input)]
+    // 매 프레임마다 마우스 좌표와 클릭 여부를 검사합니다.
+    // 이전 프레임 상태와 비교하여 마우스가 '들어온 순간', '나간 순간', '클릭한 순간'을
+    // 구분해 내고, 조건이 맞으면 ChangeState()를 호출합니다.
+    // ==============================================================================
     void Input() override {
         bool currHover = IsMouseOver();
         bool currLBit = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
 
-        // --- 1. 마우스 진입/탈출 (Hover <-> Idle) 로직 ---
+        // 호버 상태 진입/탈출 로직
         if (currHover && !prevHover) {
-            // 마우스가 들어왔을 때, 만약 대기 상태였다면 호버 상태로 전환
-            if (state == ButtonState::IDLE) {
-                ChangeState(ButtonState::HOVER);
-            }
+            if (state == ButtonState::IDLE) ChangeState(ButtonState::HOVER);
         }
         else if (!currHover && prevHover) {
-            // 마우스가 나갔을 때, 
-            // 클릭된 상태가 아니라 단순히 호버 상태였다면 대기 상태로 복귀
-            if (state == ButtonState::HOVER) {
-                ChangeState(ButtonState::IDLE);
-            }
+            if (state == ButtonState::HOVER) ChangeState(ButtonState::IDLE);
         }
 
-        // --- 2. 클릭 상태 전환 로직 ---
+        // 클릭 로직
         if (currLBit && !prevLBit && currHover) {
-            if (state == ButtonState::HOVER) {
-                ChangeState(ButtonState::CLICKED_1);
-            }
-            else if (state == ButtonState::CLICKED_1) {
-                ChangeState(ButtonState::CLICKED_2);
-            }
-            else if (state == ButtonState::CLICKED_2) {
-                // 2회 클릭 후 다시 누르면, 마우스가 아직 위에 있으므로 HOVER로 돌아감
-                ChangeState(ButtonState::HOVER);
-            }
+            if (state == ButtonState::HOVER) ChangeState(ButtonState::CLICKED_1);
+            else if (state == ButtonState::CLICKED_1) ChangeState(ButtonState::CLICKED_2);
+            else if (state == ButtonState::CLICKED_2) ChangeState(ButtonState::HOVER);
         }
 
-        // --- 3. R 키 초기화 ---
+        // R 키 초기화
         if (GetAsyncKeyState('R') & 0x8000) {
-            // R키를 누르면, 마우스가 현재 위에 있는지 여부에 따라 초기 상태 결정
             ChangeState(currHover ? ButtonState::HOVER : ButtonState::IDLE);
             Logger::Log("[ButtonFSM] Reset triggered by 'R' key.");
         }
 
-        // 상태 기억
         prevHover = currHover;
         prevLBit = currLBit;
     }
 
-    // 상태 변경 및 색상/로그 처리를 전담하는 통합 함수
+    // ==============================================================================
+    // [3. 상태 전환 및 시각 효과 문단 (Transition)]
+    // 상태가 변할 때 해야 할 일(색상 변경, 로그 출력)을 한 곳으로 모았습니다.
+    // 유지보수를 쉽게 만들고 스파게티 코드를 방지하는 FSM 패턴의 핵심입니다.
+    // ==============================================================================
     void ChangeState(ButtonState newState) {
-        if (state == newState) return; // 동일 상태면 무시
-
+        if (state == newState) return;
         state = newState;
 
         switch (state) {
         case ButtonState::IDLE:
-            pMat->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 백색
-            Logger::Log("[ButtonFSM] State: IDLE (마우스 벗어남)");
-            break;
+            pMat->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); Logger::Log("[FSM] IDLE"); break;
         case ButtonState::HOVER:
-            pMat->SetColor({ 0.8f, 0.9f, 1.0f, 1.0f }); // 연한 파란색 (호버 시각 효과)
-            Logger::Log("[ButtonFSM] State: HOVER (마우스 진입)");
-            break;
+            pMat->SetColor({ 0.8f, 0.9f, 1.0f, 1.0f }); Logger::Log("[FSM] HOVER"); break;
         case ButtonState::CLICKED_1:
-            pMat->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f }); // 노란색
-            Logger::Log("[ButtonFSM] State: CLICKED_1");
-            break;
+            pMat->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f }); Logger::Log("[FSM] CLICK_1"); break;
         case ButtonState::CLICKED_2:
-            pMat->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f }); // 빨간색
-            Logger::Log("[ButtonFSM] State: CLICKED_2");
-            break;
+            pMat->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f }); Logger::Log("[FSM] CLICK_2"); break;
         }
     }
 
+    // ==============================================================================
+    // [4. 마우스 피킹(충돌 판정) 문단]
+    // 윈도우 스크린 좌표를 게임 공간(NDC) 좌표로 변환한 뒤,
+    // 마우스(점)와 버튼(AABB 사각형)의 충돌 검사 공식을 적용하여 참/거짓을 반환합니다.
+    // ==============================================================================
     bool IsMouseOver() {
         POINT mouse; GetCursorPos(&mouse); ScreenToClient(GetActiveWindow(), &mouse);
         float mx = (mouse.x / 400.0f) - 1.0f;

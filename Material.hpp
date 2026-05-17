@@ -1,7 +1,7 @@
 #pragma once
 #include "Framework.hpp"
 
-// 1. 부상 추상 클래스
+// 1. 부모 추상 클래스
 class Material {
 public:
     ShaderSet shaders;
@@ -48,4 +48,4 @@ public:
         context->UpdateSubresource(pColorBuffer, 0, nullptr, &cb, 0, 0);
         context->PSSetConstantBuffers(1, 1, &pColorBuffer);
     }
-}; // 클래스 정의는 여기서 끝납니다!
+}; 

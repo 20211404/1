@@ -1,78 +1,21 @@
 ========== [Engine Log Started] ==========
-[Sat May 16 19:40:55 2026] Engine Initialization Started.
-[Sat May 16 19:40:55 2026] Game Loop is starting...
-[Sat May 16 19:40:56 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:40:56 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:40:58 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:40:59 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:00 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:00 2026] [ButtonFSM] State: CLICKED_1
-[Sat May 16 19:41:01 2026] --- Info Button Clicked ---
-[Sat May 16 19:41:01 2026] [INFO] 상태: CLICKED_1 | 문장: 한 번 클릭되었습니다. (노란색)
-[Sat May 16 19:41:01 2026] ---------------------------
-[Sat May 16 19:41:03 2026] [ButtonFSM] State: CLICKED_2
-[Sat May 16 19:41:04 2026] --- Info Button Clicked ---
-[Sat May 16 19:41:04 2026] [INFO] 상태: CLICKED_2 | 문장: 두 번 클릭되었습니다. (빨간색)
-[Sat May 16 19:41:04 2026] ---------------------------
-[Sat May 16 19:41:07 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:07 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:09 2026] --- Info Button Clicked ---
-[Sat May 16 19:41:09 2026] [INFO] 상태: IDLE | 문장: 마우스가 버튼 밖에 있습니다.
-[Sat May 16 19:41:09 2026] ---------------------------
-[Sat May 16 19:41:09 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:10 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:11 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:12 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:12 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:12 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:12 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:13 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:14 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:15 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:16 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:17 2026] [ButtonFSM] State: HOVER (마우스 진입)
-[Sat May 16 19:41:17 2026] [ButtonFSM] State: IDLE (마우스 벗어남)
-[Sat May 16 19:41:19 2026] Engine Terminated.
+[Mon May 18 01:14:52 2026] Engine Initialization Started.
+[Mon May 18 01:14:52 2026] Game Loop is starting...
+[Mon May 18 01:14:53 2026] [FSM] HOVER
+[Mon May 18 01:14:53 2026] [FSM] IDLE
+[Mon May 18 01:14:55 2026] [FSM] HOVER
+[Mon May 18 01:14:55 2026] [FSM] IDLE
+[Mon May 18 01:14:56 2026] [FSM] HOVER
+[Mon May 18 01:14:56 2026] [FSM] IDLE
+[Mon May 18 01:14:57 2026] [FSM] HOVER
+[Mon May 18 01:14:57 2026] [FSM] CLICK_1
+[Mon May 18 01:14:59 2026] --- Info Button Clicked ---
+[Mon May 18 01:14:59 2026] [INFO] CLICKED_1 상태
+[Mon May 18 01:15:00 2026] [FSM] CLICK_2
+[Mon May 18 01:15:01 2026] --- Info Button Clicked ---
+[Mon May 18 01:15:01 2026] [INFO] CLICKED_2 상태
+[Mon May 18 01:15:03 2026] [FSM] HOVER
+[Mon May 18 01:15:03 2026] [FSM] IDLE
+[Mon May 18 01:15:03 2026] --- Info Button Clicked ---
+[Mon May 18 01:15:03 2026] [INFO] IDLE 상태
+[Mon May 18 01:15:06 2026] Engine Terminated.
