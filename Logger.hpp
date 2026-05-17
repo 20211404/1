@@ -1,50 +1,73 @@
 #pragma once
-#include <iostream>
-#include <fstream>
+#include <windows.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <time.h>
 #include <string>
-#include <chrono>
-#include <ctime>
+
+enum class LogLevel { Info, Warning, Error };
 
 class Logger {
+private:
+    FILE* file;
+    Logger() : file(nullptr) {}
+    ~Logger() { if (file) fclose(file); }
+
 public:
     // ==============================================================================
-    // [1. 로그 초기화 문단]
-    // 프로그램이 켜질 때 딱 한 번 호출됩니다.
-    // std::ios::trunc 옵션을 사용하여 기존에 있던 engine_log.txt 파일의 내용을 
-    // 싹 지우고 깨끗한 상태에서 새 기록을 시작할 준비를 합니다.
+    // [1. 싱글톤(Singleton) 패턴 초기화]
+    // 엔진 전체에서 파일 입출력을 관리하는 객체는 단 하나만 존재해야 합니다.
+    // 정적(static) 지역 변수를 활용하여 가장 안전한 형태의 싱글톤 인스턴스를 반환합니다.
     // ==============================================================================
-    static void Init() {
-        std::ofstream file("engine_log.txt", std::ios::trunc);
-        if (file.is_open()) {
-            file << "========== [Engine Log Started] ==========\n";
-            file.close();
-        }
+    static Logger* Get() {
+        static Logger instance;
+        return &instance;
     }
 
     // ==============================================================================
-    // [2. 실제 로그 기록 문단]
-    // 아무 곳에서나 Logger::Log("메시지") 형태로 호출하면 실행됩니다.
-    // 현재 시간을 구해서 [시간] 메시지 형태로 포맷팅한 뒤, 
-    // std::cout으로 콘솔에 보여주고 std::ios::app(이어쓰기) 옵션으로 파일에 저장합니다.
+    // [2. 로그 파일 열기 및 초기화]
+    // 프로그램 시작 시 'w'(Write) 모드로 파일을 열어 이전 실행 기록을 초기화합니다.
+    // 비주얼 스튜디오의 C4996 보안 에러를 방지하기 위해 안전한 함수인 fopen_s를 사용합니다.
     // ==============================================================================
-    static void Log(const std::string& message) {
-        // 시간 구하기 및 포맷팅
-        auto now = std::chrono::system_clock::now();
-        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-        char timeStr[26];
-        ctime_s(timeStr, sizeof(timeStr), &now_c);
-        timeStr[24] = '\0'; // ctime_s가 끝에 넣는 줄바꿈(\n) 문자 제거
-
-        std::string finalMsg = "[" + std::string(timeStr) + "] " + message + "\n";
-
-        // 화면(콘솔) 출력
-        std::cout << finalMsg;
-
-        // 파일 뒤에 이어쓰기
-        std::ofstream file("engine_log.txt", std::ios::app);
-        if (file.is_open()) {
-            file << finalMsg;
-            file.close();
+    bool Initialize(const std::string& filename) {
+        // 기존의 fopen 대신 안전한 fopen_s 사용
+        if (fopen_s(&file, filename.c_str(), "w") != 0) {
+            file = nullptr;
         }
+        return file != nullptr;
+    }
+
+    // ==============================================================================
+    // [3. 가변 인자 로깅(Logging) 및 파일 기록]
+    // C언어의 가변 인자(va_list)를 사용하여 printf처럼 다양한 변수를 포맷팅합니다.
+    // 현재 시간을 계산하여 로그 레벨(Info/Warn/Error), 메시지와 함께 조립한 뒤
+    // 콘솔과 파일에 동시에 출력합니다. 
+    // fflush(file)을 호출하여 프로그램이 비정상 종료되더라도 기록이 저장되도록 보장합니다.
+    // ==============================================================================
+    void Log(LogLevel level, const char* format, ...) {
+        if (file == nullptr) return;
+
+        time_t now = time(0);
+        struct tm tstruct;
+        char timeBuf[80];
+        localtime_s(&tstruct, &now);
+        strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", &tstruct);
+
+        const char* levelStr = "";
+        switch (level) {
+        case LogLevel::Info:    levelStr = "[INFO]"; break;
+        case LogLevel::Warning: levelStr = "[WARN]"; break;
+        case LogLevel::Error:   levelStr = "[ERR ]"; break;
+        }
+
+        char messageBuf[1024];
+        va_list args;
+        va_start(args, format);
+        vsnprintf(messageBuf, sizeof(messageBuf), format, args);
+        va_end(args);
+
+        fprintf(file, "%s %s %s\n", timeBuf, levelStr, messageBuf);
+        printf("%s %s %s\n", timeBuf, levelStr, messageBuf);
+        fflush(file);
     }
 };

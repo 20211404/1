@@ -6,26 +6,19 @@
 #include "InfoButton.hpp"
 #include "Logger.hpp"
 
-// ==============================================================================
-// [1. 윈도우 메시지 처리기 (WndProc)]
-// 창의 'X' 버튼을 누르면 프로그램을 정상적으로 종료시키는 신호를 보냅니다.
-// ==============================================================================
 LRESULT CALLBACK WndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
-    if (m == WM_DESTROY) {
-        PostQuitMessage(0);
-        return 0;
-    }
+    if (m == WM_DESTROY) { PostQuitMessage(0); return 0; }
     return DefWindowProc(h, m, w, l);
 }
 
 int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR, int nS) {
     // ==============================================================================
-    // [2. 엔진 초기화 및 리소스 준비]
-    // 윈도우 창과 GPU 통신을 시작하고, 셰이더 파일과 버튼 모양의 직사각형 
-    // 정점 데이터를 메모리에 올립니다.
+    // [1. 엔진 초기화 및 리소스 준비]
+    // 싱글톤 Logger를 가장 먼저 초기화하여 이후 발생하는 모든 이벤트를 기록할 준비를 합니다.
+    // 윈도우 창과 DirectX 장치를 세팅하고, 버튼을 그릴 사각형 정점 데이터와 셰이더를 생성합니다.
     // ==============================================================================
-    Logger::Init();
-    Logger::Log("Engine Initialization Started.");
+    Logger::Get()->Initialize("EngineLog.txt");
+    Logger::Get()->Log(LogLevel::Info, "Engine Initialization Started.");
 
     GameLoop engine;
     engine.Initialize(hI, WndProc);
@@ -37,33 +30,30 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR, int nS) {
     ShaderSet shaders = engine.gfx.CompileAndCreate(L"effect.hlsl", 0, true, ied, 2);
 
     std::vector<Vertex> vRect = {
-        {{-1.0f,  1.0f, 0.0f}, {1,1,1,1}},
-        {{ 1.0f,  1.0f, 0.0f}, {1,1,1,1}},
-        {{-1.0f, -1.0f, 0.0f}, {1,1,1,1}},
-        {{-1.0f, -1.0f, 0.0f}, {1,1,1,1}},
-        {{ 1.0f,  1.0f, 0.0f}, {1,1,1,1}},
-        {{ 1.0f, -1.0f, 0.0f}, {1,1,1,1}}
+        {{-1.0f,  1.0f, 0.0f}, {1,1,1,1}}, {{ 1.0f,  1.0f, 0.0f}, {1,1,1,1}}, {{-1.0f, -1.0f, 0.0f}, {1,1,1,1}},
+        {{-1.0f, -1.0f, 0.0f}, {1,1,1,1}}, {{ 1.0f,  1.0f, 0.0f}, {1,1,1,1}}, {{ 1.0f, -1.0f, 0.0f}, {1,1,1,1}}
     };
     Mesh* gMesh = new Mesh();
     gMesh->Create(&engine.gfx, vRect);
 
     // ==============================================================================
-    // [3. 왼쪽 버튼 컴포넌트 조립]
-    // FSM 상태 기계 기능을 달아주고 화면 왼쪽에 배치합니다.
+    // [2. ECS 기반 게임 오브젝트 조립 - 왼쪽 버튼]
+    // 상속을 배제하고 빈 GameObject에 필요한 기능(컴포넌트)을 조립하는 방식을 사용합니다.
+    // 렌더링을 담당하는 MeshRenderer와 상태 제어를 담당하는 ButtonFSM을 부착합니다.
     // ==============================================================================
     GameObject* leftBtn = new GameObject(-0.5f, 0, 0);
     leftBtn->scale = { 0.3f, 0.2f, 1.0f };
     ColorMaterial* matL = new ColorMaterial(shaders, { 1, 1, 1, 1 }, engine.gfx.Device);
 
     ButtonFSM* fsmComp = new ButtonFSM(matL);
-
     leftBtn->AddComponent(new MeshRenderer(gMesh, matL));
     leftBtn->AddComponent(fsmComp);
 
     // ==============================================================================
-    // [4. 오른쪽 버튼 컴포넌트 조립]
-    // 화면 오른쪽에 배치하고, InfoButton을 장착할 때 왼쪽 버튼의 주소를 넘겨줍니다.
-    // =============================================================================
+    // [3. ECS 기반 게임 오브젝트 조립 - 오른쪽 버튼]
+    // 오른쪽 오브젝트를 구성할 때, InfoButton 컴포넌트를 부착하며
+    // 앞서 생성한 왼쪽 버튼의 포인터(fsmComp)를 전달하여 두 객체 간의 데이터 통신을 구축합니다.
+    // ==============================================================================
     GameObject* rightBtn = new GameObject(0.5f, 0, 0);
     rightBtn->scale = { 0.3f, 0.2f, 1.0f };
     ColorMaterial* matR = new ColorMaterial(shaders, { 0.5f, 0.5f, 0.5f, 1 }, engine.gfx.Device);
@@ -72,20 +62,18 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR, int nS) {
     rightBtn->AddComponent(new InfoButton(fsmComp));
 
     // ==============================================================================
-    // [5. 루프 실행 및 자원 해제]
+    // [4. 게임 루프 실행 및 리소스 해제]
+    // 완성된 오브젝트들을 월드에 등록하고 렌더링 무한 루프를 돌립니다.
+    // 프로그램 종료 시 동적 할당된 리소스들을 해제하여 메모리 누수를 방지합니다.
     // ==============================================================================
     engine.world.push_back(leftBtn);
     engine.world.push_back(rightBtn);
 
-    Logger::Log("Game Loop is starting...");
+    Logger::Get()->Log(LogLevel::Info, "Game Loop is starting...");
     engine.Run();
 
-    Logger::Log("Engine Terminated.");
+    Logger::Get()->Log(LogLevel::Info, "Engine Terminated.");
 
-    delete gMesh;
-    delete matL;
-    delete matR;
-    shaders.Release();
-
+    delete gMesh; delete matL; delete matR; shaders.Release();
     return 0;
 }
